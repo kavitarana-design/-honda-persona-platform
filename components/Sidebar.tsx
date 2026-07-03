@@ -8,7 +8,8 @@ import {
   AnalyticsIcon,
   ModulesIcon,
 } from "./icons";
-import { SAVED_PERSONAS, type NavKey } from "@/lib/data";
+import { type NavKey } from "@/lib/data";
+import { PERSONA_LIST } from "@/lib/personas";
 
 type NavItem = {
   key: NavKey;
@@ -36,9 +37,11 @@ const NAV: NavItem[] = [
 export default function Sidebar({
   variant = "workspace",
   active,
+  activePersona,
 }: {
   variant?: "admin" | "workspace";
   active: NavKey;
+  activePersona?: string;
 }) {
   return (
     <aside className="flex w-[248px] shrink-0 flex-col gap-3 border-r border-[#ECECEC] bg-white px-3 py-3.5">
@@ -118,22 +121,28 @@ export default function Sidebar({
           </span>
         </div>
         <div className="flex flex-col gap-0.5">
-          {SAVED_PERSONAS.map((p) => (
-            <div
-              key={p.initials}
-              className="flex items-center gap-[9px] rounded-[9px] px-2.5 py-[7px]"
-            >
-              <div
-                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold leading-3 text-white"
-                style={{ backgroundColor: p.color }}
+          {PERSONA_LIST.map((p) => {
+            const isActive = p.slug === activePersona;
+            return (
+              <Link
+                key={p.slug}
+                href={`/chat/${p.slug}`}
+                className={`flex items-center gap-[9px] rounded-[9px] px-2.5 py-[7px] transition-colors ${
+                  isActive ? "bg-[#F4F4F5]" : "hover:bg-[#F7F7F8]"
+                }`}
               >
-                {p.initials}
-              </div>
-              <span className="text-[12.5px] font-medium leading-4 text-[#52525B]">
-                {p.name}
-              </span>
-            </div>
-          ))}
+                <div
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold leading-3 text-white"
+                  style={{ backgroundColor: p.color }}
+                >
+                  {p.initials}
+                </div>
+                <span className={`text-[12.5px] leading-4 ${isActive ? "font-semibold text-[#18181B]" : "font-medium text-[#52525B]"}`}>
+                  {p.sidebarLabel}
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
