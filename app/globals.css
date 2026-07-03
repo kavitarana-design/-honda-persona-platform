@@ -73,3 +73,13 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+
+/* Persona character "alive" float used in the profile view */
+@keyframes personaFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes personaShadow {
+  0%, 100% { opacity: 0.16; transform: translateX(-50%) scaleX(1); }
+  50% { opacity: 0.09; transform: translateX(-50%) scaleX(0.82); }
+}

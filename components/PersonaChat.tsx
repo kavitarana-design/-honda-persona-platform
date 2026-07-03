@@ -2,21 +2,38 @@
 
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
-import Topbar, { WorkspacePill } from "@/components/Topbar";
-import type { Persona, PMessage } from "@/lib/personas";
+import Topbar from "@/components/Topbar";
+import ProfilePanel from "@/components/ProfilePanel";
+import EvidenceDrawer from "@/components/EvidenceDrawer";
+import PersonaAvatar from "@/components/PersonaAvatar";
+import Sparkle from "@/components/Sparkle";
+import { evidenceLevel, type Persona, type PMessage } from "@/lib/personas";
 
 const CHIPS = ["Emotional messaging angles", "Top objections to address", "Build a campaign brief"];
 
-const StarIcon = (
-  <svg width="13" height="13" viewBox="0 0 24 24">
-    <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 17l-6.3 4.4L8 14 2 9.4h7.6z" fill="#CC0000" />
-  </svg>
-);
+const StarIcon = <Sparkle size={13} />;
 
 export default function PersonaChat({ persona }: { persona: Persona }) {
   const [messages, setMessages] = useState<PMessage[]>([]);
   const [draft, setDraft] = useState("");
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [openEvidence, setOpenEvidence] = useState<Set<number>>(new Set());
   const started = messages.length > 0;
+
+  function toggleEvidence(i: number) {
+    setOpenEvidence((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
+  }
+
+  const level = evidenceLevel(persona.confidence);
+  const pill =
+    level === "Strong"
+      ? { bg: "#ECFDF3", fg: "#16A34A" }
+      : { bg: "#FEF3C7", fg: "#B45309" };
 
   function send(text: string) {
     const q = text.trim();
@@ -27,13 +44,16 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
   }
 
   return (
-    <AppShell variant="workspace" active="home" activePersona={persona.slug}>
+    <AppShell active="home" activePersona={persona.slug}>
       <Topbar
         title="Home"
-        sub={started ? persona.name : "New conversation"}
+        sub="New conversation"
         right={
           <>
-            <WorkspacePill label="Marketing" />
+            <span className="flex items-center gap-2 rounded-full border border-[#E4E4E7] px-3 py-1.5 text-[13px] font-medium text-[#3F3F46]">
+              <span className="h-[7px] w-[7px] rounded-sm bg-[#CC0000]" />
+              Marketing
+            </span>
             <button className="flex items-center gap-[7px] rounded-[9px] border border-[#E4E4E7] bg-white px-3 py-[7px] text-[12.5px] font-semibold text-[#52525B]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="#52525B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -46,33 +66,33 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
       />
 
       {/* Conversation */}
-      <div className="flex-1 overflow-y-auto bg-white px-[138px] pb-2 pt-[26px]">
+      <div className="flex-1 overflow-y-auto bg-white px-8 pb-6 pt-7">
         <div className="mx-auto flex w-full max-w-[880px] flex-col">
-          {/* Persona header */}
-          <div className="flex items-start gap-4 rounded-[14px] border border-[#E4E4E7] bg-white px-5 py-[18px] shadow-[0_1px_2px_#18181B0A]">
-            <svg width="76" height="76" viewBox="0 0 76 76" className="shrink-0">
-              <rect x="6" y="8" width="62" height="62" rx="22" fill={persona.face.bg} />
-              <path d="M24 37 Q29 31 34 37" fill="none" stroke={persona.face.fg} strokeWidth="2.6" strokeLinecap="round" />
-              <path d="M42 37 Q47 31 52 37" fill="none" stroke={persona.face.fg} strokeWidth="2.6" strokeLinecap="round" />
-              <path d="M29 47 Q38 56 47 47" fill="none" stroke={persona.face.fg} strokeWidth="2.6" strokeLinecap="round" />
-              <path d="M61 6 L63.4 12.6 L70 15 L63.4 17.4 L61 24 L58.6 17.4 L52 15 L58.6 12.6 Z" fill="#CC0000" />
-            </svg>
-            <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
-              <div className="flex items-center gap-[9px]">
+          {/* Persona header (v3) */}
+          <div className="flex items-center gap-4 rounded-[18px] border border-[#FFFFFFD9] bg-[#FDF8F9] px-5 py-[18px] shadow-[0_12px_30px_#18181B1A,0_2px_6px_#18181B0D]">
+            <span className="relative shrink-0">
+              <PersonaAvatar slug={persona.slug} size={48} />
+              <Sparkle size={14} className="absolute -right-0.5 -top-0.5" />
+            </span>
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <div className="flex items-center gap-2.5">
                 <span className="text-[17px] font-bold leading-[22px] tracking-[-0.01em] text-[#18181B]">{persona.name}</span>
-                <span className="text-[12px] font-medium text-[#A1A1AA]">· {persona.tagline}</span>
+                <span className="flex items-center gap-1.5 rounded-full px-[11px] py-[5px] text-[11.5px] font-semibold" style={{ backgroundColor: pill.bg, color: pill.fg }}>
+                  <span className="h-1.5 w-1.5 rounded-sm" style={{ backgroundColor: pill.fg }} />
+                  Confidence {persona.confidence}%
+                </span>
               </div>
-              <span className="text-[12.5px] font-medium text-[#71717A]">{persona.meta}</span>
-              <span className="text-[12.5px] leading-[18px] text-[#A1A1AA]">{persona.description}</span>
+              <span className="text-[12.5px] font-medium leading-4 text-[#71717A]">{persona.meta}</span>
             </div>
-            <div className="flex shrink-0 flex-col items-end justify-center gap-2">
-              <span className="flex items-center gap-1.5 rounded-full bg-[#ECFDF3] px-[11px] py-[5px] text-[11.5px] font-semibold text-[#16A34A]">
-                <span className="h-1.5 w-1.5 rounded-sm bg-[#16A34A]" />
-                Confidence {persona.confidence}%
-              </span>
-              <span className="rounded-full bg-[#F4F4F5] px-[11px] py-[5px] text-[11.5px] font-semibold text-[#71717A]">{persona.records}</span>
-              <button className="rounded-[9px] border border-[#E4E4E7] px-3 py-[7px] text-[12.5px] font-semibold text-[#52525B]">Switch persona</button>
-            </div>
+            <button
+              onClick={() => setProfileOpen(true)}
+              className="flex shrink-0 items-center gap-[3px] text-[13px] font-medium text-[#6E6E73] transition-colors hover:text-[#CC0000]"
+            >
+              View profile
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                <path d="M6 4 L10 8 L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
           </div>
 
           {started ? (
@@ -86,29 +106,43 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
               {messages.map((m, i) =>
                 m.role === "user" ? (
                   <div key={i} className="mt-[18px] flex flex-row-reverse items-start gap-3">
-                    <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[15px] bg-[#3F3F46] text-[11px] font-bold text-white">AL</span>
-                    <div className="max-w-[600px] rounded-[14px] bg-[#EBEBEB] px-4 py-3">
-                      <p className="text-[13.5px] leading-5 text-[#525252]">{m.text[0]}</p>
+                    <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[15px] bg-[#CC0000] text-[11px] font-bold text-white">AL</span>
+                    <div className="max-w-[600px] rounded-[14px] bg-[#FDECEC] px-4 py-3">
+                      <p className="text-[13.5px] leading-5 text-[#353535]">{m.text[0]}</p>
                     </div>
                   </div>
                 ) : (
                   <div key={i} className="mt-[18px] flex items-start gap-3">
                     <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[15px] bg-[#27272A] text-[11px] font-bold text-white">{persona.initials}</span>
                     <div className="flex max-w-[640px] flex-col gap-[9px] rounded-[14px] border border-[#E4E4E7] bg-white px-4 py-[13px] shadow-[0_1px_2px_#18181B0A]">
-                      {m.text.map((p, j) => (
-                        <p key={j} className="text-[13.5px] leading-5 text-[#27272A]">{p}</p>
+                      {m.text.map((t, j) => (
+                        <p key={j} className="text-[13.5px] leading-5 text-[#27272A]">{t}</p>
                       ))}
                       {m.evidence && (
-                        <div className="mt-0.5 flex items-center gap-2.5 border-t border-dashed border-[#E4E4E7] pt-2.5">
-                          <span
-                            className="rounded-full px-[9px] py-[3px] text-[11px] font-bold"
-                            style={m.evidence.strength === "Strong"
-                              ? { backgroundColor: "#ECFDF3", color: "#16A34A" }
-                              : { backgroundColor: "#FEF3C7", color: "#B45309" }}
-                          >
-                            ✓ {m.evidence.strength} evidence
-                          </span>
-                          <span className="text-[11.5px] font-medium text-[#A1A1AA]">{m.evidence.sources}</span>
+                        <div className="pt-[10px]">
+                          <div className="flex items-center gap-2">
+                            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" className="shrink-0">
+                              <circle cx="8" cy="8" r="7.5" fill={m.evidence.strength === "Strong" ? "#15803D" : "#B45309"} />
+                              <path d="M4.8 8.2 L7 10.3 L11.2 5.9" fill="none" stroke="#FFFFFF" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            <span className="text-[13px] font-semibold leading-4" style={{ color: m.evidence.strength === "Strong" ? "#15803D" : "#B45309" }}>
+                              {m.evidence.strength}
+                            </span>
+                            <span className="text-[13px] leading-4 text-[#6E6E73]">
+                              grounded in {persona.evidence.sourceCount} of {persona.records.replace(" records", "")} posts
+                            </span>
+                            <span className="min-w-4 flex-1" />
+                            <button
+                              onClick={() => toggleEvidence(i)}
+                              className="flex shrink-0 items-center gap-1.5 rounded-full border border-[#E4E4E7] bg-white px-3 py-1.5 text-[13px] font-medium text-[#0E0E10] transition-colors hover:border-[#CC0000]"
+                            >
+                              {openEvidence.has(i) ? "Hide evidence" : "Show evidence"}
+                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                <path d={openEvidence.has(i) ? "M4 10 L8 6 L12 10" : "M6 4 L10 8 L6 12"} stroke="#6E6E73" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </button>
+                          </div>
+                          {openEvidence.has(i) && <EvidenceDrawer persona={persona} strength={m.evidence.strength} />}
                         </div>
                       )}
                     </div>
@@ -118,34 +152,12 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
             </>
           ) : (
             <div className="mt-10 flex flex-col items-center gap-5 text-center">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FFF1F1]">
-                <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
-                  <path d="M9 2.2l1.7 4.4 4.6.3-3.6 2.9 1.2 4.5L9 12.2 5.1 14.8l1.2-4.5L2.7 7.4l4.6-.3L9 2.2z" stroke="#CC0000" strokeWidth="1.3" strokeLinejoin="round" />
-                </svg>
-              </span>
+              <Sparkle size={30} />
               <div className="flex flex-col gap-1.5">
                 <h2 className="text-[19px] font-bold tracking-[-0.01em] text-[#18181B]">Start a conversation with {persona.name.split(" ").slice(-1)[0]}</h2>
                 <p className="max-w-[420px] text-[13px] leading-[19px] text-[#71717A]">
-                  Pick a prompt to begin, or ask your own below. Every answer is grounded in public consumer data.
+                  Ask a question below to begin. Every answer is grounded in evidence.
                 </p>
-              </div>
-              <div className="mt-1 flex w-full max-w-[560px] flex-col gap-2">
-                {persona.starters.map((s) => (
-                  <button
-                    key={s.title}
-                    onClick={() => send(s.prompt)}
-                    className="flex items-center gap-3 rounded-[12px] border border-[#E4E4E7] bg-white px-4 py-3 text-left transition-colors hover:border-[#CC0000] hover:bg-[#FFF8F8]"
-                  >
-                    <span className="shrink-0">{StarIcon}</span>
-                    <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="text-[13.5px] font-semibold text-[#18181B]">{s.title}</span>
-                      <span className="truncate text-[12px] text-[#A1A1AA]">{s.prompt}</span>
-                    </span>
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0">
-                      <path d="M5 3l4 4-4 4" stroke="#C4C4CC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                ))}
               </div>
             </div>
           )}
@@ -153,13 +165,13 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
       </div>
 
       {/* Composer */}
-      <div className="flex flex-col items-center border-t border-[#ECECEC] bg-white px-[138px] pb-4 pt-3.5">
+      <div className="flex flex-col items-center border-t border-[#ECECEC] bg-white px-8 pb-4 pt-3.5">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             send(draft);
           }}
-          className="flex w-full max-w-[880px] flex-col gap-[11px]"
+          className="flex w-full max-w-[680px] flex-col gap-[11px]"
         >
           <div className="flex justify-center gap-2">
             {CHIPS.map((c) => (
@@ -174,9 +186,9 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-2.5 rounded-2xl border border-[#E4E4E7] bg-white px-[11px] py-[9px] shadow-[0_1px_2px_#18181B0D] focus-within:border-[#CC0000]">
-            <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px]">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <div className="flex items-center gap-2 rounded-xl border border-[#E4E4E7] bg-white px-2.5 py-1.5 shadow-[0_1px_2px_#18181B0D] focus-within:border-[#CC0000]">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
                 <path d="M21 11l-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8" stroke="#71717A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </span>
@@ -189,20 +201,17 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
             <button
               type="submit"
               aria-label="Send"
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] transition-colors ${
-                draft.trim() ? "bg-[#CC0000]" : "bg-[#EAEAEA]"
-              }`}
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] transition-colors ${draft.trim() ? "bg-[#CC0000]" : "bg-[#EAEAEA]"}`}
             >
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                 <path d="M9 14.5v-11M4.5 8L9 3.5 13.5 8" stroke={draft.trim() ? "#FFFFFF" : "#71717A"} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           </div>
-          <p className="text-center text-[11px] text-[#A1A1AA]">
-            Responses are grounded in public consumer data · Marketing framing · English
-          </p>
         </form>
       </div>
+
+      {profileOpen && <ProfilePanel persona={persona} onClose={() => setProfileOpen(false)} />}
     </AppShell>
   );
 }

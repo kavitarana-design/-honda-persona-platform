@@ -1,5 +1,5 @@
 import AppShell from "@/components/AppShell";
-import Topbar, { WorkspacePill } from "@/components/Topbar";
+import Topbar, { WorkspaceCard } from "@/components/Topbar";
 
 const KPIS = [
   { label: "Research questions", value: "8,420", delta: "12% vs last period", up: true },
@@ -65,11 +65,11 @@ function Arrow({ up }: { up: boolean }) {
 
 export default function AnalyticsPage() {
   return (
-    <AppShell variant="workspace" active="analytics">
-      <Topbar title="Analytics" right={<WorkspacePill label="Marketing" />} />
+    <AppShell active="analytics">
+      <Topbar title="Analytics" right={<WorkspaceCard />} />
 
       <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
-        <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-4 px-8 py-6">
+        <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-4 px-8 py-7">
           {/* Heading */}
           <div className="flex items-end justify-between">
             <div className="flex flex-col gap-1.5">

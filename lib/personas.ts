@@ -2,6 +2,34 @@ export type Evidence = { strength: "Strong" | "Mixed"; sources: string };
 export type PMessage = { role: "user" | "persona"; text: string[]; evidence?: Evidence };
 export type Starter = { title: string; prompt: string };
 
+export type PersonaProfile = {
+  goals: string[];
+  objections: string[];
+  quote: string;
+  scenario: string;
+  keyNeeds: string;
+  whatMoves: string;
+  sources: string;
+};
+
+export type EvidenceSource = {
+  platform: string;
+  meta: string;
+  quote: string;
+  match: string;
+  tone: "green" | "amber";
+};
+
+export type EvidenceDetail = {
+  sourceCount: number;
+  agree: string;
+  summary: string;
+  sources: EvidenceSource[];
+  moreCount: number;
+  counter: { label: string; quote: string };
+  groundingPct: number;
+};
+
 export type Persona = {
   slug: string;
   name: string; // clean name for the chat header
@@ -17,6 +45,8 @@ export type Persona = {
   starters: Starter[];
   responses: Record<string, PMessage>;
   fallback: PMessage;
+  profile: PersonaProfile;
+  evidence: EvidenceDetail;
 };
 
 function ev(strength: Evidence["strength"], sources: string): Evidence {
@@ -28,7 +58,7 @@ export const PERSONAS: Record<string, Persona> = {
     slug: "aspirational-arjun",
     name: "Aspirational Arjun",
     sidebarLabel: "Aspirational Arjun · Metro",
-    initials: "AK",
+    initials: "AA",
     color: "#2563EB",
     face: { bg: "#DBEAFE", fg: "#2563EB" },
     tagline: "Metro first-car buyer",
@@ -41,8 +71,17 @@ export const PERSONAS: Record<string, Persona> = {
       { title: "City hybrid vs. Creta", prompt: "How does Arjun feel about the City hybrid vs. the Creta, and what would actually push him to choose Honda?" },
       { title: "Top objections to a Honda hybrid", prompt: "What are Arjun's biggest objections to choosing a Honda hybrid?" },
       { title: "Emotional messaging angles", prompt: "Which emotional messaging angles would resonate most with Arjun?" },
+      { title: "Charging & EV hesitation", prompt: "How does charging anxiety shape Arjun's view of EVs?" },
     ],
     responses: {
+      "How does charging anxiety shape Arjun's view of EVs?": {
+        role: "persona",
+        text: [
+          "I'm genuinely curious about EVs, but the charging question stops me. In an apartment, I can't guarantee a home charger, and public ones feel hit-or-miss.",
+          "A hybrid feels like the safe middle ground for now. Show me charging is sorted and I'd reconsider a full EV in a heartbeat.",
+        ],
+        evidence: ev("Strong", "4 sources · YouTube, Reddit, TeamBHP"),
+      },
       "How does Arjun feel about the City hybrid vs. the Creta, and what would actually push him to choose Honda?": {
         role: "persona",
         text: [
@@ -76,6 +115,39 @@ export const PERSONAS: Record<string, Persona> = {
       ],
       evidence: ev("Strong", "5 sources · Reddit, YouTube, TeamBHP"),
     },
+    profile: {
+      goals: [
+        "Buy his first “proper” car within the next 3 months",
+        "Keep 5-year running and ownership cost predictable",
+        "A cabin that feels modern, not plain, next to peers",
+      ],
+      objections: [
+        "Honda feels reliable but a little plain inside",
+        "Hard to justify paying the hybrid premium up front",
+        "Creta looks like more car for the money to peers",
+      ],
+      quote:
+        "The City just feels like the sensible adult choice — I trust the engine and the resale holds up better than most.",
+      scenario:
+        "Upgrading from a hatchback to his first “proper” car for city drives and the occasional weekend trip.",
+      keyNeeds: "Resale value · low running cost · modern cabin · 3 more",
+      whatMoves: "Proof over promises · peer validation · 2 more",
+      sources: "Reddit, YouTube, TeamBHP, CarDekho · refreshed Jun 2026",
+    },
+    evidence: {
+      sourceCount: 5,
+      agree: "4 of 5 sources agree",
+      summary:
+        "Owners independently echo the resale and running-cost view. One source pushes back on paying the hybrid premium.",
+      sources: [
+        { platform: "Reddit", meta: "r/IndianCars · Apr 2026", quote: "Honestly the resale on the City just holds up better than the Creta after five years.", match: "resale value", tone: "green" },
+        { platform: "YouTube", meta: "Ownership review · Mar 2026", quote: "Did the maths over five years and the hybrid running cost actually works out cheaper.", match: "running cost", tone: "green" },
+        { platform: "TeamBHP", meta: "Forum thread · Feb 2026", quote: "Creta feels more premium inside — the City cabin is starting to look plain next to it.", match: "cabin feel", tone: "amber" },
+      ],
+      moreCount: 2,
+      counter: { label: "1 in 5 saw it differently", quote: "Skip the hybrid premium — a well-kept petrol City makes more sense if you drive under 1,000 km a month." },
+      groundingPct: 92,
+    },
   },
 
   "practical-meera": {
@@ -95,8 +167,17 @@ export const PERSONAS: Record<string, Persona> = {
       { title: "What decides her upgrade", prompt: "What matters most to Meera when upgrading the family car?" },
       { title: "Cost vs. features", prompt: "How does Meera weigh price against features?" },
       { title: "What breaks her trust", prompt: "What would make Meera distrust Honda?" },
+      { title: "Safety for the family", prompt: "How much does safety weigh in Meera's decision?" },
     ],
     responses: {
+      "How much does safety weigh in Meera's decision?": {
+        role: "persona",
+        text: [
+          "It matters a lot once running cost is settled — I'm carrying the kids every day. Airbags, a solid crash rating and good brakes reassure me.",
+          "But I won't pay a big premium for safety features I can't see working. Make the essentials standard and I trust the brand more.",
+        ],
+        evidence: ev("Strong", "3 sources · CarDekho, TeamBHP"),
+      },
       "What matters most to Meera when upgrading the family car?": {
         role: "persona",
         text: [
@@ -129,6 +210,39 @@ export const PERSONAS: Record<string, Persona> = {
       ],
       evidence: ev("Strong", "4 sources · CarDekho, TeamBHP"),
     },
+    profile: {
+      goals: [
+        "Replace the ageing hatchback with a safe family car this year",
+        "Keep running and service costs low over the long haul",
+        "Enough space and comfort for two growing kids",
+      ],
+      objections: [
+        "Unsure the nearest service centre is quick and honest",
+        "Won't pay extra for features she'll never use",
+        "Wary of anything unproven on reliability",
+      ],
+      quote:
+        "If it's cheap to run and the service centre is close and honest, that matters more than how it looks.",
+      scenario:
+        "Upgrading the family hatchback for daily school runs and weekend trips across Tier-2 roads.",
+      keyNeeds: "Running cost · service reach · space · safety · 2 more",
+      whatMoves: "Owner word-of-mouth · predictable upkeep · 2 more",
+      sources: "TeamBHP, CarDekho, Reddit · refreshed Jun 2026",
+    },
+    evidence: {
+      sourceCount: 4,
+      agree: "3 of 4 sources agree",
+      summary:
+        "Tier-2 owners consistently prize service reach and low upkeep. One flags limited weekend service hours.",
+      sources: [
+        { platform: "TeamBHP", meta: "Ownership thread · Mar 2026", quote: "The nearest Honda service is quick and fairly priced — that's why I stuck with the brand.", match: "service reach", tone: "green" },
+        { platform: "CarDekho", meta: "Owner review · Feb 2026", quote: "Running cost has been the lowest of any car we've owned; spares are cheap.", match: "running cost", tone: "green" },
+        { platform: "Reddit", meta: "r/IndianCars · Jan 2026", quote: "Wish the weekend service slots weren't so hard to book in smaller towns.", match: "service hours", tone: "amber" },
+      ],
+      moreCount: 1,
+      counter: { label: "1 in 4 saw it differently", quote: "A local independent garage works out cheaper than the brand centre once the car is out of warranty." },
+      groundingPct: 88,
+    },
   },
 
   "ev-curious-rohan": {
@@ -148,8 +262,17 @@ export const PERSONAS: Record<string, Persona> = {
       { title: "EV vs. hybrid", prompt: "How does Rohan weigh a full EV against a hybrid?" },
       { title: "Charging anxiety", prompt: "How big a deal is charging anxiety for Rohan?" },
       { title: "What closes the sale", prompt: "What would finally get Rohan to buy?" },
+      { title: "In-car tech expectations", prompt: "What in-car tech does Rohan expect at this price?" },
     ],
     responses: {
+      "What in-car tech does Rohan expect at this price?": {
+        role: "persona",
+        text: [
+          "At ₹15–20L I expect a crisp screen, wireless CarPlay, a proper connected app, and OTA updates. Laggy software is an instant turn-off.",
+          "Honda feels dependable but a step behind on tech. Close that gap and it moves up my list fast.",
+        ],
+        evidence: ev("Mixed", "3 sources · YouTube, Reddit"),
+      },
       "How does Rohan weigh a full EV against a hybrid?": {
         role: "persona",
         text: [
@@ -182,6 +305,39 @@ export const PERSONAS: Record<string, Persona> = {
       ],
       evidence: ev("Strong", "5 sources · YouTube, Reddit, TeamBHP"),
     },
+    profile: {
+      goals: [
+        "Move to a full EV or strong hybrid as a second car",
+        "Avoid range and charging anxiety on highway drives",
+        "Modern in-car tech that stays up to date",
+      ],
+      objections: [
+        "Highway charging still feels like a gamble",
+        "Uncertain three-year resale value on EVs",
+        "Honda feels a step behind rivals on tech",
+      ],
+      quote:
+        "I'd go full EV tomorrow if highway charging wasn't a gamble and the resale actually held up.",
+      scenario:
+        "Adding a second car, weighing a full EV against a hybrid for city commutes and long weekend drives.",
+      keyNeeds: "Real-world range · charging access · resale · tech · 1 more",
+      whatMoves: "Hard data over claims · early-adopter proof · 1 more",
+      sources: "YouTube, Reddit, TeamBHP, CarDekho · refreshed Jun 2026",
+    },
+    evidence: {
+      sourceCount: 5,
+      agree: "3 of 5 sources agree",
+      summary:
+        "EV-curious owners rate the tech and torque highly, but highway charging and resale split opinion.",
+      sources: [
+        { platform: "YouTube", meta: "EV road-trip · Apr 2026", quote: "City charging is a non-issue — it's the highway fast-chargers that make me nervous.", match: "charging access", tone: "amber" },
+        { platform: "Reddit", meta: "r/IndianEVs · Mar 2026", quote: "Instant torque and running cost make the EV worth it if you mostly drive in the city.", match: "running cost", tone: "green" },
+        { platform: "TeamBHP", meta: "Forum thread · Feb 2026", quote: "Three-year resale on EVs is still a big unknown compared with a hybrid.", match: "resale", tone: "amber" },
+      ],
+      moreCount: 2,
+      counter: { label: "2 in 5 saw it differently", quote: "A strong hybrid removes all the range anxiety and still cuts the fuel bill." },
+      groundingPct: 79,
+    },
   },
 
   "value-seeker-sunita": {
@@ -201,8 +357,17 @@ export const PERSONAS: Record<string, Persona> = {
       { title: "Best value pick", prompt: "Which car gives Sunita the best value?" },
       { title: "Mileage vs. price", prompt: "How does Sunita trade off mileage against upfront price?" },
       { title: "Deal-breakers", prompt: "What are Sunita's deal-breakers?" },
+      { title: "Resale confidence", prompt: "How much does resale value influence Sunita?" },
     ],
     responses: {
+      "How much does resale value influence Sunita?": {
+        role: "persona",
+        text: [
+          "A lot — I keep a car for years, but I still want it to hold value if I ever sell. A brand known for strong resale earns my trust.",
+          "If two cars cost the same to run, the one that resells better wins. That's often where Honda quietly scores.",
+        ],
+        evidence: ev("Strong", "3 sources · CarDekho, Reddit"),
+      },
       "Which car gives Sunita the best value?": {
         role: "persona",
         text: [
@@ -235,8 +400,46 @@ export const PERSONAS: Record<string, Persona> = {
       ],
       evidence: ev("Strong", "4 sources · CarDekho, Reddit"),
     },
+    profile: {
+      goals: [
+        "Replace the old sedan at the lowest sensible total cost",
+        "Best possible mileage and cheap maintenance",
+        "A car that holds its resale value for years",
+      ],
+      objections: [
+        "Expensive spares or a far service centre are deal-breakers",
+        "Won't pay for brand image she can't use",
+        "Needs the five-year cost on paper before deciding",
+      ],
+      quote:
+        "Cheap to buy, cheap to run, cheap to fix — the badge on the bonnet doesn't earn a single rupee.",
+      scenario:
+        "Replacing an ageing sedan for business errands and family use, scrutinising every rupee of total cost.",
+      keyNeeds: "Upfront price · mileage · maintenance · resale · 1 more",
+      whatMoves: "Total-cost proof · dependable track record · 1 more",
+      sources: "CarDekho, Reddit, TeamBHP · refreshed Jun 2026",
+    },
+    evidence: {
+      sourceCount: 4,
+      agree: "3 of 4 sources agree",
+      summary:
+        "Budget owners agree total cost decides it; opinions differ on paying more upfront for better mileage.",
+      sources: [
+        { platform: "CarDekho", meta: "Owner review · Mar 2026", quote: "Cheapest car I've run — mileage and service costs are exactly what sold me.", match: "running cost", tone: "green" },
+        { platform: "Reddit", meta: "r/IndianCars · Feb 2026", quote: "Resale held up far better than I expected when I sold after six years.", match: "resale value", tone: "green" },
+        { platform: "TeamBHP", meta: "Forum thread · Jan 2026", quote: "Paying extra upfront for a hybrid rarely pays back if your yearly running is low.", match: "upfront price", tone: "amber" },
+      ],
+      moreCount: 1,
+      counter: { label: "1 in 4 saw it differently", quote: "Spend a little more upfront on a proven model — it's cheaper to keep over ten years." },
+      groundingPct: 74,
+    },
   },
 };
 
 export const PERSONA_LIST = Object.values(PERSONAS);
 export const DEFAULT_PERSONA_SLUG = "aspirational-arjun";
+
+// Home cards show a Strong/Mixed evidence dot derived from confidence.
+export function evidenceLevel(confidence: number): "Strong" | "Mixed" {
+  return confidence >= 80 ? "Strong" : "Mixed";
+}
