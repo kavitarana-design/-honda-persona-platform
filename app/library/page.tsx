@@ -4,9 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import Topbar, { WorkspaceCard } from "@/components/Topbar";
-import PersonaFace from "@/components/PersonaFace";
+import PersonaAvatar from "@/components/PersonaAvatar";
 import FilterDropdown, { RadioRow, CheckRow } from "@/components/library/FilterDropdown";
-import { LIBRARY_PERSONAS, LIBRARY_TABS, TAB_SUBTITLE, DEPARTMENTS, SORTS, type LibraryPersona } from "@/lib/library";
+import { LIBRARY_PERSONAS, LIBRARY_TABS, TAB_SUBTITLE, DEPARTMENTS, SORTS, PERSONA_IMAGE, type LibraryPersona } from "@/lib/library";
 
 const CONFIDENCE_OPTS = [
   { label: "Strong", dot: "#16A34A" },
@@ -19,7 +19,7 @@ function Card({ p }: { p: LibraryPersona }) {
   return (
     <Link href="/builder" className="flex flex-col gap-[11px] rounded-xl border border-[#E4E4E7] bg-white p-4 transition-all hover:border-[#D4D4D8] hover:shadow-[0_2px_8px_#18181B0F]">
       <div className="flex items-start gap-[11px]">
-        <PersonaFace bg={p.face.bg} fg={p.face.fg} size={40} radius={20} />
+        <PersonaAvatar slug={PERSONA_IMAGE[p.name]} size={40} />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="truncate text-[14px] font-semibold leading-[18px] text-[#18181B]">{p.name}</span>
           <span className="truncate text-[12px] font-medium leading-4 text-[#A1A1AA]">{p.role}</span>
@@ -50,7 +50,7 @@ function ListRow({ p }: { p: LibraryPersona }) {
   const c = p.confidence === "Strong" ? { bg: "#ECFDF3", fg: "#16A34A" } : { bg: "#FEF3C7", fg: "#B45309" };
   return (
     <Link href="/builder" className="flex items-center gap-4 rounded-xl border border-[#E4E4E7] bg-white px-4 py-3 transition-all hover:border-[#D4D4D8] hover:shadow-[0_2px_8px_#18181B0F]">
-      <PersonaFace bg={p.face.bg} fg={p.face.fg} size={40} radius={20} />
+      <PersonaAvatar slug={PERSONA_IMAGE[p.name]} size={40} />
       <div className="flex w-[190px] shrink-0 flex-col gap-0.5">
         <span className="truncate text-[14px] font-semibold leading-[18px] text-[#18181B]">{p.name}</span>
         <span className="truncate text-[12px] font-medium leading-4 text-[#A1A1AA]">{p.role}</span>
@@ -111,10 +111,10 @@ export default function PersonaLibraryPage() {
         <div className="mx-auto flex w-full max-w-[1100px] flex-col gap-5 px-8 py-7">
           {/* Header */}
           <div className="flex items-start justify-between gap-4">
-            <div className="flex flex-col gap-1">
-              <span className="text-[13px] font-medium text-[#A1A1AA]">Marketing workspace</span>
-              <h1 className="text-[24px] font-bold leading-8 tracking-[-0.02em] text-[#18181B]">Persona Library</h1>
-              <p className="text-[13px] font-medium text-[#71717A]">{TAB_SUBTITLE[tab]}</p>
+            <div className="flex flex-col">
+              <span className="text-[13px] font-medium leading-none text-[#A1A1AA]">Marketing workspace</span>
+              <h1 className="mt-[20px] text-[24px] font-bold leading-none tracking-[-0.02em] text-[#18181B]">Persona Library</h1>
+              <p className="mt-[16px] text-[13px] font-medium leading-none text-[#71717A]">{TAB_SUBTITLE[tab]}</p>
             </div>
             <Link href="/builder" className="flex shrink-0 items-center gap-[7px] rounded-[9px] bg-[#CC0000] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#B8041A]">
               <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3 V13 M3 8 H13" stroke="#FFFFFF" strokeWidth="1.7" strokeLinecap="round" /></svg>

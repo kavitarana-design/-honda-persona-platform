@@ -8,6 +8,7 @@ export type LibraryPersona = {
   recordsK: number;
   department: string;
   face: { bg: string; fg: string };
+  slug?: string; // when set, a character illustration exists at /personas/<slug>-2.jpg
   owner: { name: string; initials: string; color: string } | null;
   group: "mine" | "shared" | "template";
 };
@@ -19,10 +20,10 @@ const SAM = { name: "Sam Lee", initials: "SL", color: "#B45309" };
 
 export const LIBRARY_PERSONAS: LibraryPersona[] = [
   // Mine (5)
-  { name: "Aspirational Arjun", role: "Metro first-car buyer", meta: "28 · Bengaluru · First-car buyer", description: "Researches obsessively, weighs resale heavily, quietly drawn to EVs but anxious about charging.", confidence: "Strong", records: "1.24M", recordsK: 1240, department: "Marketing", face: { bg: "#DBEAFE", fg: "#2563EB" }, owner: ALEX, group: "mine" },
-  { name: "Practical Meera", role: "Tier-2 family buyer", meta: "35 · Nagpur · Family buyer", description: "Prioritises cabin space, mileage and nearby service reach over features or styling.", confidence: "Strong", records: "0.94M", recordsK: 940, department: "Marketing", face: { bg: "#EDE9FE", fg: "#7C3AED" }, owner: ALEX, group: "mine" },
-  { name: "EV-curious Rohan", role: "EV-curious upgrader", meta: "31 · Pune · Second car", description: "Excited by EVs and tech, tracks charging news, won't gamble on range or resale.", confidence: "Mixed", records: "1.10M", recordsK: 1100, department: "EV Strategy", face: { bg: "#CCFBF1", fg: "#0F766E" }, owner: ALEX, group: "mine" },
-  { name: "Value Seeker Sunita", role: "Budget-first buyer", meta: "42 · Jaipur · Replacing sedan", description: "Scrutinises every rupee — price, mileage and upkeep decide it; brand barely registers.", confidence: "Mixed", records: "0.82M", recordsK: 820, department: "Marketing", face: { bg: "#FEF3C7", fg: "#B45309" }, owner: ALEX, group: "mine" },
+  { name: "Aspirational Arjun", role: "Metro first-car buyer", meta: "28 · Bengaluru · First-car buyer", description: "Researches obsessively, weighs resale heavily, quietly drawn to EVs but anxious about charging.", confidence: "Strong", records: "1.24M", recordsK: 1240, department: "Marketing", face: { bg: "#DBEAFE", fg: "#2563EB" }, slug: "aspirational-arjun", owner: ALEX, group: "mine" },
+  { name: "Practical Meera", role: "Tier-2 family buyer", meta: "35 · Nagpur · Family buyer", description: "Prioritises cabin space, mileage and nearby service reach over features or styling.", confidence: "Strong", records: "0.94M", recordsK: 940, department: "Marketing", face: { bg: "#EDE9FE", fg: "#7C3AED" }, slug: "practical-meera", owner: ALEX, group: "mine" },
+  { name: "EV-curious Rohan", role: "EV-curious upgrader", meta: "31 · Pune · Second car", description: "Excited by EVs and tech, tracks charging news, won't gamble on range or resale.", confidence: "Mixed", records: "1.10M", recordsK: 1100, department: "EV Strategy", face: { bg: "#CCFBF1", fg: "#0F766E" }, slug: "ev-curious-rohan", owner: ALEX, group: "mine" },
+  { name: "Value Seeker Sunita", role: "Budget-first buyer", meta: "42 · Jaipur · Replacing sedan", description: "Scrutinises every rupee — price, mileage and upkeep decide it; brand barely registers.", confidence: "Mixed", records: "0.82M", recordsK: 820, department: "Marketing", face: { bg: "#FEF3C7", fg: "#B45309" }, slug: "value-seeker-sunita", owner: ALEX, group: "mine" },
   { name: "Skeptical Imran", role: "Brand switcher", meta: "38 · Lucknow · Considering switch", description: "Loyal to his current brand; needs hard proof on cost and reliability to move.", confidence: "Mixed", records: "0.61M", recordsK: 610, department: "Product Planning", face: { bg: "#FFE4E6", fg: "#BE123C" }, owner: ALEX, group: "mine" },
 
   // Shared (4)
@@ -36,6 +37,16 @@ export const LIBRARY_PERSONAS: LibraryPersona[] = [
   { name: "EV intender", role: "Template · EV segment", meta: "Starter template · edit to fit", description: "A ready EV-curious base — tune charging access, range and price sensitivity.", confidence: "Strong", records: "—", recordsK: 0, department: "", face: { bg: "#F4F4F5", fg: "#71717A" }, owner: null, group: "template" },
   { name: "Fleet / commercial", role: "Template · Commercial", meta: "Starter template · edit to fit", description: "A commercial-buyer base focused on running cost, uptime and total cost of ownership.", confidence: "Strong", records: "—", recordsK: 0, department: "", face: { bg: "#F4F4F5", fg: "#71717A" }, owner: null, group: "template" },
 ];
+
+// Character illustrations available at /personas/<slug>-2.jpg.
+export const CHARACTER_SLUGS = ["aspirational-arjun", "practical-meera", "ev-curious-rohan", "value-seeker-sunita"] as const;
+
+// Every persona shows a character image. Those with their own use it; the rest reuse
+// one from the pool — keyed by name and indexed by list position so it's stable
+// regardless of the active filter or sort.
+export const PERSONA_IMAGE: Record<string, string> = Object.fromEntries(
+  LIBRARY_PERSONAS.map((p, i) => [p.name, p.slug ?? CHARACTER_SLUGS[i % CHARACTER_SLUGS.length]])
+);
 
 export const LIBRARY_TABS = [
   { key: "all", label: "All" },
