@@ -443,3 +443,23 @@ export const DEFAULT_PERSONA_SLUG = "aspirational-arjun";
 export function evidenceLevel(confidence: number): "Strong" | "Mixed" {
   return confidence >= 80 ? "Strong" : "Mixed";
 }
+
+// Keyword hints so a plain-language prompt can be matched to the right persona.
+const MATCH_KEYWORDS: Record<string, string[]> = {
+  "ev-curious-rohan": ["ev", "electric", "charging", "charge", "battery", "range", "sustainab"],
+  "value-seeker-sunita": ["budget", "value", "price", "cost", "cheap", "affordable", "resale", "mileage", "emi", "running cost", "money"],
+  "practical-meera": ["family", "tier-2", "tier 2", "practical", "safety", "space", "kids", "service", "reliab", "hatchback"],
+  "aspirational-arjun": ["first car", "aspiration", "metro", "style", "styling", "brand", "status", "hybrid", "city", "modern", "look"],
+};
+
+// Rank personas against a plain-language prompt. Best match first; falls back to
+// confidence order when nothing matches (e.g. an empty prompt).
+export function recommendPersonas(query: string): Persona[] {
+  const q = (query || "").toLowerCase();
+  return PERSONA_LIST.map((p) => {
+    const score = (MATCH_KEYWORDS[p.slug] ?? []).reduce((n, k) => n + (q.includes(k) ? 1 : 0), 0);
+    return { p, score };
+  })
+    .sort((a, b) => b.score - a.score || b.p.confidence - a.p.confidence)
+    .map((s) => s.p);
+}

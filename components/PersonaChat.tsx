@@ -1,24 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
 import Topbar from "@/components/Topbar";
 import ProfilePanel from "@/components/ProfilePanel";
 import EvidenceDrawer from "@/components/EvidenceDrawer";
 import PersonaAvatar from "@/components/PersonaAvatar";
 import Sparkle from "@/components/Sparkle";
+import RiveDot from "@/components/RiveDot";
+import GeneratingWaves from "@/components/GeneratingWaves";
 import { evidenceLevel, type Persona, type PMessage } from "@/lib/personas";
 
 const CHIPS = ["Emotional messaging angles", "Top objections to address", "Build a campaign brief"];
 
 const StarIcon = <Sparkle size={13} />;
 
+// How long a persona "thinks" before its answer appears.
+const GENERATION_MS = 15000;
+
+// Cycled status text shown (with the animated sparkle) while a reply generates.
+const THINKING_PHRASES = ["Thinking", "Working", "Analyzing the evidence", "Reading the data", "Composing a response"];
+
 export default function PersonaChat({ persona }: { persona: Persona }) {
   const [messages, setMessages] = useState<PMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [profileOpen, setProfileOpen] = useState(false);
   const [openEvidence, setOpenEvidence] = useState<Set<number>>(new Set());
+  const [pending, setPending] = useState(false);
+  const [phase, setPhase] = useState(0);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const endRef = useRef<HTMLDivElement | null>(null);
   const started = messages.length > 0;
+
+  // Clear the pending timer if the user navigates away mid-generation.
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  // Keep the newest message / thinking indicator in view.
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages.length, pending]);
+
+  // Cycle the status text while generating.
+  useEffect(() => {
+    if (!pending) {
+      setPhase(0);
+      return;
+    }
+    const id = setInterval(() => setPhase((p) => (p + 1) % THINKING_PHRASES.length), 1500);
+    return () => clearInterval(id);
+  }, [pending]);
 
   function toggleEvidence(i: number) {
     setOpenEvidence((prev) => {
@@ -36,11 +70,22 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
       : { bg: "#FEF3C7", fg: "#B45309" };
 
   function send(text: string) {
+    if (pending) return;
     const q = text.trim();
     if (!q) return;
     const response = persona.responses[q] ?? persona.fallback;
-    setMessages((prev) => [...prev, { role: "user", text: [q] }, response]);
+
+    // Show the user's message right away, then "generate" the reply for GENERATION_MS
+    // while the character visibly thinks.
+    setMessages((prev) => [...prev, { role: "user", text: [q] }]);
     setDraft("");
+    setPending(true);
+
+    timeoutRef.current = setTimeout(() => {
+      setMessages((prev) => [...prev, response]);
+      setPending(false);
+      timeoutRef.current = null;
+    }, GENERATION_MS);
   }
 
   return (
@@ -54,7 +99,7 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
               <span className="h-[7px] w-[7px] rounded-sm bg-[#CC0000]" />
               Marketing
             </span>
-            <button className="flex items-center gap-[7px] rounded-[9px] border border-[#E4E4E7] bg-white px-3 py-[7px] text-[12.5px] font-semibold text-[#52525B]">
+            <button className="flex items-center gap-[7px] rounded-[9px] border border-[#E4E4E7] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#52525B] transition-colors hover:bg-[#FAFAFA]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="#52525B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M7 10l5 5 5-5M12 15V3" stroke="#52525B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -65,10 +110,12 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
         }
       />
 
-      {/* Conversation */}
-      <div className="flex-1 overflow-y-auto bg-white px-8 pb-6 pt-7">
-        <div className="mx-auto flex w-full max-w-[880px] flex-col">
-          {/* Persona header (v3) */}
+      {/* Conversation + composer share one continuous background (no band behind the chatbox) */}
+      <div className="bg-app relative flex min-h-0 flex-1 flex-col">
+      {pending && <GeneratingWaves />}
+      {/* Persona header — pinned; does not scroll with the conversation */}
+      <div className="shrink-0 px-8 pb-3 pt-6">
+        <div className="mx-auto w-full max-w-[880px]">
           <div className="flex items-center gap-4 rounded-[18px] border border-[#FFFFFFD9] bg-[#FDF8F9] px-5 py-[18px] shadow-[0_12px_30px_#18181B1A,0_2px_6px_#18181B0D]">
             <span className="relative shrink-0">
               <PersonaAvatar slug={persona.slug} size={48} />
@@ -94,7 +141,12 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
               </svg>
             </button>
           </div>
+        </div>
+      </div>
 
+      {/* Conversation (scrolls) */}
+      <div className="min-h-0 flex-1 overflow-y-auto px-8 pb-6 pt-1">
+        <div className="mx-auto flex w-full max-w-[880px] flex-col">
           {started ? (
             <>
               <div className="mb-0.5 mt-6 flex items-center gap-3">
@@ -113,7 +165,7 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
                   </div>
                 ) : (
                   <div key={i} className="mt-[18px] flex items-start gap-3">
-                    <span className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[15px] bg-[#27272A] text-[11px] font-bold text-white">{persona.initials}</span>
+                    <PersonaAvatar slug={persona.slug} size={30} className="mt-0.5" />
                     <div className="flex max-w-[640px] flex-col gap-[9px] rounded-[14px] border border-[#E4E4E7] bg-white px-4 py-[13px] shadow-[0_1px_2px_#18181B0A]">
                       {m.text.map((t, j) => (
                         <p key={j} className="text-[13.5px] leading-5 text-[#27272A]">{t}</p>
@@ -149,10 +201,23 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
                   </div>
                 )
               )}
+
+              {pending && (
+                <div className="mt-[18px] flex items-center gap-2.5" role="status" aria-label={`${persona.name} is thinking`}>
+                  <RiveDot size={64} className="shrink-0" />
+                  <span
+                    key={phase}
+                    style={{ animation: "greetReveal 0.6s ease both" }}
+                    className="text-[13.5px] font-medium text-[#71717A]"
+                  >
+                    {THINKING_PHRASES[phase]}…
+                  </span>
+                </div>
+              )}
             </>
           ) : (
             <div className="mt-10 flex flex-col items-center gap-5 text-center">
-              <Sparkle size={30} />
+              <Sparkle size={30} animated />
               <div className="flex flex-col gap-1.5">
                 <h2 className="text-[19px] font-bold tracking-[-0.01em] text-[#18181B]">Start a conversation with {persona.name.split(" ").slice(-1)[0]}</h2>
                 <p className="max-w-[420px] text-[13px] leading-[19px] text-[#71717A]">
@@ -161,11 +226,12 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
               </div>
             </div>
           )}
+          <div ref={endRef} />
         </div>
       </div>
 
-      {/* Composer */}
-      <div className="flex flex-col items-center border-t border-[#ECECEC] bg-white px-8 pb-4 pt-3.5">
+      {/* Composer — transparent so the chatbox + prompts sit on the gradient */}
+      <div className="flex shrink-0 flex-col items-center px-8 pb-4 pt-3.5">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -179,36 +245,35 @@ export default function PersonaChat({ persona }: { persona: Persona }) {
                 type="button"
                 key={c}
                 onClick={() => send(c)}
-                className="flex items-center gap-1.5 rounded-full border border-[#E4E4E7] bg-white px-3 py-1.5 text-[12px] font-medium text-[#52525B] transition-colors hover:border-[#CC0000] hover:text-[#CC0000]"
+                disabled={pending}
+                className="flex items-center gap-1.5 rounded-full border border-[#E4E4E7] bg-white px-3 py-1.5 text-[12px] font-medium text-[#52525B] transition-colors hover:border-[#CC0000] hover:text-[#CC0000] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-[#E4E4E7] disabled:hover:text-[#52525B]"
               >
                 {StarIcon}
                 {c}
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-2 rounded-xl border border-[#E4E4E7] bg-white px-2.5 py-1.5 shadow-[0_1px_2px_#18181B0D] focus-within:border-[#CC0000]">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-                <path d="M21 11l-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8" stroke="#71717A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
+          <div className="flex items-center gap-2 rounded-[26px] border border-[#E4E4E7] bg-white px-2.5 py-1.5 shadow-[0_2px_12px_#18181B0D] transition-all duration-150 focus-within:border-[#CC000080] focus-within:shadow-[0_0_0_3px_#FDECEE,0_8px_22px_#18181B14]">
             <input
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              placeholder={`Ask ${persona.name} anything…`}
-              className="flex-1 bg-transparent text-[14px] text-[#18181B] placeholder:text-[#A1A1AA] focus:outline-none"
+              disabled={pending}
+              placeholder={pending ? "Generating answer…" : `Ask ${persona.name} anything…`}
+              className="flex-1 bg-transparent pl-1.5 text-[14px] text-[#18181B] placeholder:text-[#A1A1AA] focus:outline-none disabled:cursor-not-allowed"
             />
             <button
               type="submit"
               aria-label="Send"
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] transition-colors ${draft.trim() ? "bg-[#CC0000]" : "bg-[#EAEAEA]"}`}
+              disabled={pending || !draft.trim()}
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors ${!pending && draft.trim() ? "bg-[#CC0000]" : "bg-[#EAEAEA]"} disabled:cursor-not-allowed`}
             >
-              <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                <path d="M9 14.5v-11M4.5 8L9 3.5 13.5 8" stroke={draft.trim() ? "#FFFFFF" : "#71717A"} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+              <svg width="13" height="13" viewBox="0 0 18 18" fill="none">
+                <path d="M9 14.5v-11M4.5 8L9 3.5 13.5 8" stroke={!pending && draft.trim() ? "#FFFFFF" : "#71717A"} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           </div>
         </form>
+      </div>
       </div>
 
       {profileOpen && <ProfilePanel persona={persona} onClose={() => setProfileOpen(false)} />}

@@ -1,6 +1,7 @@
 import Image from "next/image";
 
-/* Round persona avatar backed by the character illustration in /public/personas. */
+/* Round persona avatar backed by the character illustration in /public/personas.
+   Static — no animation, no background. */
 export default function PersonaAvatar({
   slug,
   size,
@@ -12,11 +13,11 @@ export default function PersonaAvatar({
 }) {
   return (
     <span
-      className={`relative inline-block shrink-0 overflow-hidden rounded-full bg-[#F4F4F5] ${className}`}
+      className={`relative inline-block shrink-0 overflow-hidden rounded-full ${className}`}
       style={{ width: size, height: size }}
     >
       <Image
-        src={`/personas/${slug}.jpg`}
+        src={`/personas/${slug}-2.jpg`}
         alt=""
         fill
         sizes={`${size}px`}

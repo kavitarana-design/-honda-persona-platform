@@ -2,9 +2,10 @@ import { notFound } from "next/navigation";
 import PersonaChat from "@/components/PersonaChat";
 import { PERSONAS } from "@/lib/personas";
 
-export function generateStaticParams() {
-  return Object.keys(PERSONAS).map((slug) => ({ slug }));
-}
+// Render each persona chat on demand instead of pre-generating all of them. The static
+// pre-render step (generateStaticParams) was intermittently crashing the Next dev worker
+// ("Jest worker encountered ... child process exceptions"); dynamic rendering avoids it.
+export const dynamic = "force-dynamic";
 
 export default async function PersonaChatPage({
   params,

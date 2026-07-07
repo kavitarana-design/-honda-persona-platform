@@ -21,7 +21,7 @@ export default function OrchestrationPage() {
         right={<WorkspaceCard />}
       />
 
-      <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
+      <div className="bg-app flex-1 overflow-y-auto">
         {phase === "empty" && <EmptyState onSubmit={() => setPhase("plan")} />}
         {phase === "plan" && <PlanState onEdit={() => setPhase("empty")} onRun={() => setPhase("running")} />}
         {phase === "running" && <RunningState onEdit={() => setPhase("plan")} onDone={() => setPhase("results")} />}

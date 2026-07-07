@@ -88,20 +88,14 @@ export default function ProfilePanel({ persona, onClose }: { persona: Persona; o
         <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-5 py-5">
           {/* Character */}
           <div className="flex flex-col items-center gap-4 pt-1">
-            <div className="group relative flex h-[132px] w-[132px] items-end justify-center">
-              <span
-                aria-hidden
-                className="absolute bottom-1 left-1/2 h-2.5 w-[74px] rounded-[50%] bg-[#18181B] blur-[5px]"
-                style={{ animation: "personaShadow 4.5s ease-in-out infinite" }}
-              />
+            <div className="flex items-center justify-center">
               <Image
-                src={`/personas/${persona.slug}.jpg`}
+                src={`/personas/${persona.slug}-2.jpg`}
                 alt={persona.name}
-                width={132}
-                height={132}
+                width={128}
+                height={128}
                 priority
-                className="relative h-[132px] w-[132px] object-contain transition-transform duration-300 group-hover:scale-[1.04]"
-                style={{ animation: "personaFloat 4.5s ease-in-out infinite" }}
+                className="h-32 w-32 object-contain"
               />
             </div>
             <div className="flex flex-col items-center gap-2 text-center">

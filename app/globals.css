@@ -74,6 +74,12 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Warm app background — cream fading to peach toward the bottom (sampled from the reference).
+   Shared by the home hero, the content screens, and the chat conversation. */
+.bg-app {
+  background: linear-gradient(180deg, #f8f4f1 0%, #f8f4f1 40%, #fdedde 100%);
+}
+
 /* Persona character "alive" float used in the profile view */
 @keyframes personaFloat {
   0%, 100% { transform: translateY(0); }
@@ -82,4 +88,91 @@ body {
 @keyframes personaShadow {
   0%, 100% { opacity: 0.16; transform: translateX(-50%) scaleX(1); }
   50% { opacity: 0.09; transform: translateX(-50%) scaleX(0.82); }
+}
+
+/* Animated persona face — blink, glance, and cycle expressions. GPU-only (transform/opacity). */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes faceBlink {
+    0%, 88%, 100% { transform: scaleY(1); }
+    93% { transform: scaleY(0.1); }
+  }
+  @keyframes faceLook {
+    0%, 22% { transform: translateX(0); }
+    38%, 54% { transform: translateX(0.9px); }
+    70%, 86% { transform: translateX(-0.9px); }
+    100% { transform: translateX(0); }
+  }
+  /* three stacked expressions cross-fade: happy -> neutral -> grin */
+  @keyframes faceExprA { 0%, 26%, 100% { opacity: 1; } 34%, 92% { opacity: 0; } }
+  @keyframes faceExprB { 0%, 30% { opacity: 0; } 40%, 60% { opacity: 1; } 70%, 100% { opacity: 0; } }
+  @keyframes faceExprC { 0%, 66% { opacity: 0; } 76%, 94% { opacity: 1; } 100%, 100% { opacity: 0; } }
+
+  /* PersonaCharacter (77.svg) eye blink — collapse the pupil vertically. */
+  @keyframes pcBlink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.08); }
+  }
+  .pc-blink { animation: pcBlink 5.4s ease-in-out infinite; }
+
+  /* ThinkingCharacter (88.svg) thought-bubble dot — gentle pulse. */
+  @keyframes pcThink {
+    0%, 100% { transform: scale(0.85); opacity: 0.55; }
+    50% { transform: scale(1.2); opacity: 1; }
+  }
+  .pc-think { animation: pcThink 1.6s ease-in-out infinite; }
+
+  /* Home hero character swap — fade + scale in when the active character changes. */
+  @keyframes pcSwapIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* Composer sparkle — one full rotation, then a couple of blinks, on a loop. */
+  @keyframes sparkleSpinBlink {
+    0% { transform: rotate(0deg) scale(1); opacity: 1; }
+    48% { transform: rotate(360deg) scale(1); opacity: 1; }
+    60% { transform: rotate(360deg) scale(0.55); opacity: 0.3; }
+    72% { transform: rotate(360deg) scale(1); opacity: 1; }
+    84% { transform: rotate(360deg) scale(0.55); opacity: 0.3; }
+    96%, 100% { transform: rotate(360deg) scale(1); opacity: 1; }
+  }
+  .sparkle-anim {
+    transform-origin: center;
+    animation: sparkleSpinBlink 3s ease-in-out infinite;
+  }
+
+  /* Generating-state undulating waves at the bottom of the chat. */
+  @keyframes gwUndulate {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-9px); }
+  }
+  .gw-wave {
+    animation-name: gwUndulate;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+}
+
+/* Idle for persona illustrations — gentle side sway only (no vertical bob). */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes avatarIdle {
+    0%, 100% { transform: rotate(-1deg); }
+    50% { transform: rotate(1deg); }
+  }
+}
+
+/* "Generating answer" typing dots — gentle bounce. Static (full-opacity) fallback under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes typingDot {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
+    40%           { transform: translateY(-3px); opacity: 1; }
+  }
+}
+
+/* One-time reveal for the home greeting (wipes in left-to-right with a rise). */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes greetReveal {
+    from { opacity: 0; transform: translateY(10px); clip-path: inset(0 100% 0 0); }
+    to { opacity: 1; transform: translateY(0); clip-path: inset(0 0 0 0); }
+  }
 }

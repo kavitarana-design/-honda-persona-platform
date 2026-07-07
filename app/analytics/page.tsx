@@ -68,7 +68,7 @@ export default function AnalyticsPage() {
     <AppShell active="analytics">
       <Topbar title="Analytics" right={<WorkspaceCard />} />
 
-      <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
+      <div className="bg-app flex-1 overflow-y-auto">
         <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-4 px-8 py-7">
           {/* Heading */}
           <div className="flex items-end justify-between">
@@ -78,8 +78,8 @@ export default function AnalyticsPage() {
               <p className="text-[13px] font-medium text-[#71717A]">Longitudinal view of consumer intelligence, persona usage, and trust.</p>
             </div>
             <div className="flex items-center gap-2.5">
-              <button className="flex items-center gap-2 rounded-[9px] border border-[#E4E4E7] bg-white px-3 py-2 text-[13px] font-medium text-[#3F3F46]">Last 6 months <span className="text-[#A1A1AA]">▾</span></button>
-              <button className="flex items-center gap-1.5 rounded-[9px] border border-[#E4E4E7] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#52525B]">
+              <button className="flex items-center gap-2 rounded-[9px] border border-[#E4E4E7] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#52525B] transition-colors hover:bg-[#FAFAFA]">Last 6 months <span className="text-[#A1A1AA]">▾</span></button>
+              <button className="flex items-center gap-1.5 rounded-[9px] border border-[#E4E4E7] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#52525B] transition-colors hover:bg-[#FAFAFA]">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="#52525B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /><path d="M7 10l5 5 5-5M12 15V3" stroke="#52525B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 Export
               </button>
@@ -112,7 +112,7 @@ export default function AnalyticsPage() {
                 <span className="rounded-full bg-[#FDECEC] px-2 py-0.5 text-[11px] font-semibold text-[#CC0000]">+34% MoM</span>
               </div>
               <p className="text-[13px] leading-[19px] text-[#71717A]">Driven by EV-interested personas in Tier-1 metros, concentrated in dimension D9 (EV &amp; charging).</p>
-              <button className="mt-1 w-fit rounded-[9px] bg-[#CC0000] px-3.5 py-2 text-[13px] font-semibold text-white">View topic</button>
+              <button className="mt-1 w-fit rounded-[9px] bg-[#CC0000] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#B8041A]">View topic</button>
             </div>
             <div className="flex flex-1 flex-col gap-3 rounded-xl border border-[#ECECEC] bg-white p-5">
               <span className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#A1A1AA]">Sentiment shift</span>
@@ -121,7 +121,7 @@ export default function AnalyticsPage() {
                 <span className="rounded-full bg-[#ECFDF3] px-2 py-0.5 text-[11px] font-semibold text-[#16A34A]">+6 pts</span>
               </div>
               <p className="text-[13px] leading-[19px] text-[#71717A]">Net sentiment toward Honda improved this month while rival brands stayed broadly flat.</p>
-              <button className="mt-1 w-fit rounded-[9px] border border-[#E4E4E7] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#52525B]">Explore</button>
+              <button className="mt-1 w-fit rounded-[9px] border border-[#E4E4E7] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#52525B] transition-colors hover:bg-[#FAFAFA]">Explore</button>
             </div>
           </div>
 
@@ -141,7 +141,7 @@ export default function AnalyticsPage() {
                 <span className="text-[11.5px] font-medium text-[#B45309]">2 dimensions flagged thin-data this month</span>
               </div>
             </div>
-            <button className="shrink-0 rounded-[9px] border border-[#E4E4E7] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#52525B]">Edit thresholds</button>
+            <button className="shrink-0 rounded-[9px] border border-[#E4E4E7] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#52525B] transition-colors hover:bg-[#FAFAFA]">Edit thresholds</button>
           </div>
 
           {/* Heatmap */}

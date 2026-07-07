@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import Topbar, { WorkspaceCard } from "@/components/Topbar";
 import PersonaFace from "@/components/PersonaFace";
+import PersonaAvatar from "@/components/PersonaAvatar";
 import { LIBRARY_PERSONAS } from "@/lib/library";
 import { SAVED_BRIEFS } from "@/lib/orchestration";
 
@@ -39,7 +40,7 @@ export default function SearchPage() {
     <AppShell active="search">
       <Topbar title="Search" right={<WorkspaceCard />} />
 
-      <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
+      <div className="bg-app flex-1 overflow-y-auto">
         <div className="mx-auto flex w-full max-w-[820px] flex-col gap-5 px-8 py-7">
           {/* Search field */}
           <div className="flex items-center gap-3 rounded-[14px] border border-[#E4E4E7] bg-white px-4 py-3.5 shadow-[0_1px_2px_#18181B0D] focus-within:border-[#CC0000]">
@@ -90,7 +91,11 @@ export default function SearchPage() {
                       const dot = p.confidence === "Strong" ? "#16A34A" : "#D97706";
                       return (
                         <Link key={p.name} href={slug ? `/chat/${slug}` : "/library"} className="flex items-center gap-3 rounded-xl border border-[#E4E4E7] bg-white p-3 transition-colors hover:border-[#CC0000]">
-                          <PersonaFace bg={p.face.bg} fg={p.face.fg} size={36} radius={18} />
+                          {slug ? (
+                            <PersonaAvatar slug={slug} size={36} />
+                          ) : (
+                            <PersonaFace bg={p.face.bg} fg={p.face.fg} size={36} radius={18} />
+                          )}
                           <div className="flex min-w-0 flex-1 flex-col">
                             <span className="truncate text-[13.5px] font-semibold text-[#18181B]">{p.name}</span>
                             <span className="truncate text-[12px] text-[#71717A]">{p.role} · {p.meta}</span>

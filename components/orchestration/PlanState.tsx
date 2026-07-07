@@ -160,7 +160,7 @@ export default function PlanState({ onEdit, onRun }: { onEdit: () => void; onRun
         )}
         <span className="text-[12.5px] text-[#A1A1AA]">You can pause or stop anytime</span>
         <span className="flex-1" />
-        <button onClick={onRun} className="flex items-center gap-2 rounded-[9px] bg-[#CC0000] px-5 py-2.5 text-[13px] font-semibold text-white">
+        <button onClick={onRun} className="flex items-center gap-2 rounded-[9px] bg-[#CC0000] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#B8041A]">
           Run research
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>

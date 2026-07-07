@@ -46,12 +46,40 @@ function Card({ p }: { p: LibraryPersona }) {
   );
 }
 
+function ListRow({ p }: { p: LibraryPersona }) {
+  const c = p.confidence === "Strong" ? { bg: "#ECFDF3", fg: "#16A34A" } : { bg: "#FEF3C7", fg: "#B45309" };
+  return (
+    <Link href="/builder" className="flex items-center gap-4 rounded-xl border border-[#E4E4E7] bg-white px-4 py-3 transition-all hover:border-[#D4D4D8] hover:shadow-[0_2px_8px_#18181B0F]">
+      <PersonaFace bg={p.face.bg} fg={p.face.fg} size={40} radius={20} />
+      <div className="flex w-[190px] shrink-0 flex-col gap-0.5">
+        <span className="truncate text-[14px] font-semibold leading-[18px] text-[#18181B]">{p.name}</span>
+        <span className="truncate text-[12px] font-medium leading-4 text-[#A1A1AA]">{p.role}</span>
+      </div>
+      <span className="hidden w-[150px] shrink-0 truncate text-[12.5px] font-medium text-[#71717A] lg:block">{p.meta}</span>
+      <span className="hidden min-w-0 flex-1 truncate text-[12.5px] leading-[18px] text-[#A1A1AA] md:block">{p.description}</span>
+      <span className="flex shrink-0 items-center gap-1.5 rounded-full px-[9px] py-[3px] text-[11px] font-semibold" style={{ backgroundColor: c.bg, color: c.fg }}>
+        <span className="h-[5px] w-[5px] rounded-sm" style={{ backgroundColor: c.fg }} />
+        {p.confidence}
+      </span>
+      <span className="hidden w-[52px] shrink-0 text-right text-[11.5px] font-semibold text-[#71717A] sm:block">{p.records}</span>
+      {p.owner && (
+        <span className="hidden shrink-0 items-center gap-1.5 xl:flex">
+          <span className="flex h-[18px] w-[18px] items-center justify-center rounded-[9px] text-[8px] font-bold text-white" style={{ backgroundColor: p.owner.color }}>{p.owner.initials}</span>
+          <span className="text-[11.5px] font-semibold text-[#52525B]">{p.owner.name}</span>
+        </span>
+      )}
+      <svg width="18" height="18" viewBox="0 0 24 24" className="shrink-0"><circle cx="12" cy="5" r="1.6" fill="#C4C4CC" /><circle cx="12" cy="12" r="1.6" fill="#C4C4CC" /><circle cx="12" cy="19" r="1.6" fill="#C4C4CC" /></svg>
+    </Link>
+  );
+}
+
 export default function PersonaLibraryPage() {
   const [tab, setTab] = useState<string>("all");
   const [query, setQuery] = useState("");
   const [dept, setDept] = useState("All departments");
   const [conf, setConf] = useState<Set<string>>(new Set());
   const [sort, setSort] = useState(SORTS[0]);
+  const [view, setView] = useState<"grid" | "list">("grid");
 
   const toggleConf = (c: string) => {
     const next = new Set(conf);
@@ -79,7 +107,7 @@ export default function PersonaLibraryPage() {
     <AppShell active="library">
       <Topbar title="Persona Library" right={<WorkspaceCard />} />
 
-      <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
+      <div className="bg-app flex-1 overflow-y-auto">
         <div className="mx-auto flex w-full max-w-[1100px] flex-col gap-5 px-8 py-7">
           {/* Header */}
           <div className="flex items-start justify-between gap-4">
@@ -88,7 +116,7 @@ export default function PersonaLibraryPage() {
               <h1 className="text-[24px] font-bold leading-8 tracking-[-0.02em] text-[#18181B]">Persona Library</h1>
               <p className="text-[13px] font-medium text-[#71717A]">{TAB_SUBTITLE[tab]}</p>
             </div>
-            <Link href="/builder" className="flex shrink-0 items-center gap-[7px] rounded-[10px] bg-[#CC0000] px-4 py-2.5 text-[14px] font-semibold text-white">
+            <Link href="/builder" className="flex shrink-0 items-center gap-[7px] rounded-[9px] bg-[#CC0000] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#B8041A]">
               <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3 V13 M3 8 H13" stroke="#FFFFFF" strokeWidth="1.7" strokeLinecap="round" /></svg>
               New persona
             </Link>
@@ -132,27 +160,62 @@ export default function PersonaLibraryPage() {
             </FilterDropdown>
           </div>
 
-          {/* Tabs */}
-          <div className="flex gap-6 border-b border-[#ECECEC]">
-            {LIBRARY_TABS.map((t) => (
+          {/* Tabs + view toggle */}
+          <div className="flex items-end justify-between">
+            <div className="flex flex-1 gap-6 border-b border-[#ECECEC]">
+              {LIBRARY_TABS.map((t) => (
+                <button
+                  key={t.key}
+                  onClick={() => setTab(t.key)}
+                  className={`-mb-px flex items-center gap-1.5 border-b-2 pb-2.5 text-[13.5px] font-medium ${
+                    tab === t.key ? "border-[#CC0000] text-[#18181B]" : "border-transparent text-[#A1A1AA]"
+                  }`}
+                >
+                  {t.label}
+                  <span className={`rounded-full px-1.5 py-0.5 text-[11px] font-bold ${tab === t.key ? "bg-[#FDECEC] text-[#CC0000]" : "bg-[#F4F4F5] text-[#A1A1AA]"}`}>{count(t.key)}</span>
+                </button>
+              ))}
+            </div>
+            <div className="mb-1.5 ml-4 flex shrink-0 items-center gap-0.5 rounded-lg border border-[#E4E4E7] bg-white p-0.5">
               <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
-                className={`-mb-px flex items-center gap-1.5 border-b-2 pb-2.5 text-[13.5px] font-medium ${
-                  tab === t.key ? "border-[#CC0000] text-[#18181B]" : "border-transparent text-[#A1A1AA]"
-                }`}
+                onClick={() => setView("grid")}
+                aria-label="Grid view"
+                aria-pressed={view === "grid"}
+                className={`flex h-7 w-7 items-center justify-center rounded-md transition-colors ${view === "grid" ? "bg-[#F4F4F5] text-[#18181B]" : "text-[#A1A1AA] hover:text-[#52525B]"}`}
               >
-                {t.label}
-                <span className={`rounded-full px-1.5 py-0.5 text-[11px] font-bold ${tab === t.key ? "bg-[#FDECEC] text-[#CC0000]" : "bg-[#F4F4F5] text-[#A1A1AA]"}`}>{count(t.key)}</span>
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+                  <rect x="2" y="2" width="5" height="5" rx="1.2" fill="currentColor" />
+                  <rect x="9" y="2" width="5" height="5" rx="1.2" fill="currentColor" />
+                  <rect x="2" y="9" width="5" height="5" rx="1.2" fill="currentColor" />
+                  <rect x="9" y="9" width="5" height="5" rx="1.2" fill="currentColor" />
+                </svg>
               </button>
-            ))}
+              <button
+                onClick={() => setView("list")}
+                aria-label="List view"
+                aria-pressed={view === "list"}
+                className={`flex h-7 w-7 items-center justify-center rounded-md transition-colors ${view === "list" ? "bg-[#F4F4F5] text-[#18181B]" : "text-[#A1A1AA] hover:text-[#52525B]"}`}
+              >
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+                  <rect x="2" y="3" width="12" height="2" rx="1" fill="currentColor" />
+                  <rect x="2" y="7" width="12" height="2" rx="1" fill="currentColor" />
+                  <rect x="2" y="11" width="12" height="2" rx="1" fill="currentColor" />
+                </svg>
+              </button>
+            </div>
           </div>
 
-          {/* Grid */}
+          {/* Personas — grid or list */}
           {visible.length ? (
-            <div className="grid grid-cols-3 gap-3.5">
-              {visible.map((p) => <Card key={p.name} p={p} />)}
-            </div>
+            view === "grid" ? (
+              <div className="grid grid-cols-3 gap-3.5">
+                {visible.map((p) => <Card key={p.name} p={p} />)}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2.5">
+                {visible.map((p) => <ListRow key={p.name} p={p} />)}
+              </div>
+            )
           ) : (
             <div className="rounded-xl border border-dashed border-[#DEDEE1] bg-white py-16 text-center text-[13px] text-[#A1A1AA]">
               No personas match “{query}”.

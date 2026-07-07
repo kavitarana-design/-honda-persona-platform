@@ -100,12 +100,12 @@ export default function BuilderPage() {
         right={
           <>
             <button className="text-[13px] font-medium text-[#71717A]">Discard</button>
-            <button className="rounded-[9px] bg-[#CC0000] px-4 py-2 text-[13px] font-semibold text-white">Save persona</button>
+            <button className="rounded-[9px] bg-[#CC0000] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#B8041A]">Save persona</button>
           </>
         }
       />
 
-      <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
+      <div className="bg-app flex-1 overflow-y-auto">
         <div className="mx-auto flex w-full max-w-[1120px] gap-12 px-8 py-7">
           {/* Form */}
           <div className="flex min-w-0 flex-1 flex-col">

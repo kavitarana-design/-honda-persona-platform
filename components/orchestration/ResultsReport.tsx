@@ -39,8 +39,8 @@ export default function ResultsReport({ onReRun }: { onReRun: () => void }) {
           <span className="text-[12.5px] font-medium text-[#71717A]">{REPORT.meta}</span>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-[7px] rounded-[9px] border border-[#E4E4E7] bg-white px-[13px] py-2 text-[12.5px] font-semibold text-[#52525B]">{DownloadIcon}PDF</button>
-          <button className="flex items-center gap-[7px] rounded-[9px] border border-[#E4E4E7] bg-white px-[13px] py-2 text-[12.5px] font-semibold text-[#52525B]">{DownloadIcon}Excel</button>
+          <button className="flex items-center gap-[7px] rounded-[9px] border border-[#E4E4E7] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#52525B] transition-colors hover:bg-[#FAFAFA]">{DownloadIcon}PDF</button>
+          <button className="flex items-center gap-[7px] rounded-[9px] border border-[#E4E4E7] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#52525B] transition-colors hover:bg-[#FAFAFA]">{DownloadIcon}Excel</button>
           <button onClick={onReRun} className="flex items-center gap-[7px] rounded-[9px] bg-[#18181B] px-3.5 py-2 text-[12.5px] font-semibold text-white">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 2v6h-6" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /><path d="M3 12a9 9 0 0 1 15-6.7L21 8" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
             Re-run

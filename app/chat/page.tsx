@@ -57,7 +57,7 @@ export default function NewConversationPage() {
 
           <Link
             href="/library"
-            className="flex items-center gap-1.5 rounded-[9px] border border-[#E4E4E7] bg-white px-4 py-2 text-[13px] font-semibold text-[#52525B] transition-colors hover:border-[#CC0000] hover:text-[#CC0000]"
+            className="flex items-center gap-1.5 rounded-[9px] border border-[#E4E4E7] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#52525B] transition-colors hover:bg-[#FAFAFA]"
           >
             View all personas
             <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
